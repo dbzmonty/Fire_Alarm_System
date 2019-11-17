@@ -1,5 +1,4 @@
 Indoor:
--------
 
 1	VDD		P+
 7	RC3		SW1 IN
@@ -15,4 +14,47 @@ Indoor:
 17	RA2		LCD RS (COMMAND / DATA)
 18	RA1		LCD CLK (ENABLE)
 20	VSS		P-
+
+Controller:
+
+1	MCLR	P+
+2	RA0		
+3	RA1		
+4	RA2		
+5	RA3		
+6	RA4		
+7	RA5		
+8	RE0		
+9	RE1		
+10	RE2		
+11	VDD		P+
+12	VSS		P-
+13	OSC1	CRYSTAL
+14	OSC2	CRYSTAL
+15	RC0		
+16	RC1		
+17	RC2		
+18	RC3		SCL
+19	RD0		
+20	RD1		
+21	RD2		
+22	RD3		
+23	RC4		SDA
+24	RC5		
+25	RC6		TX
+26	RC7		RX
+27	RD4		
+28	RD5		
+29	RD6		
+30	RD7		
+31	VSS		P-
+32	VDD		P+
+33	RB0		DHT22
+34	RB1		
+35	RB2		
+36	RB3		
+37	RB4		
+38	RB5		
+39	RB6		
+40	RB7		
 
