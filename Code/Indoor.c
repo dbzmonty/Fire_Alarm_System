@@ -5,6 +5,7 @@
  * Sources used: 
  * https://circuitdigest.com/microcontroller-projects/16x2-lcd-interfacing-with-pic-microcontroller
  * https://circuitdigest.com/microcontroller-projects/uart-communication-using-pic16f877a
+ * https://stackoverflow.com/questions/46030610/pic16f1829-uart-rx-interrupt-not-working-using-mplabx-and-xc8-compiler
  *
  * Created on 2019. november 10., 11:05
  */
@@ -22,7 +23,6 @@
 #define SW3 PORTCbits.RC7
 #define LED	PORTBbits.RB6
 
-#define Baud_rate 9600
 #define _XTAL_FREQ 4000000
 #pragma config FOSC=INTRCIO, WDTE=OFF, PWRTE=OFF, MCLRE=ON, CP=OFF, CPD=OFF, BOREN=OFF, IESO=OFF, FCMEN=OFF
 
@@ -32,9 +32,17 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+//// Function declarations
+void Reset(void);
+void CheckButtons(void);
+void Alarmed(void);
+void CheckRecieved(void);
+
 // Variables
+int flagRXFramingError = 0;
+int flagRXOverrunError = 0;
+volatile unsigned char Received;
 bool Alert;
-char Received;
 
 // LCD functions
 void Lcd_SetBit(char data_bit)
@@ -138,51 +146,80 @@ void Lcd_Print_String(char *a)
 }
 
 // Serial communication functions
-void Initialize_UART(void)
+unsigned char RX()
 {
-	TRISBbits.TRISB7 = 0;	// TX
-	TRISBbits.TRISB5 = 1;	// RX
-	
-    SPBRG = ((_XTAL_FREQ/16)/Baud_rate) - 1;
-    BRGH  = 1;	// For high baud_rate
-    SYNC  = 0;	// Asynchronous
-    SPEN  = 1;	// Enable serial port pins
-    TXEN  = 1;	// Enable transmission
-    CREN  = 1;	// Enable reception
-    TX9   = 0;	// 8-bit transmission mode selected
-    RX9   = 0;	// 8-bit reception mode selected
-}
-
-void UART_send_char(char bt)
-{
-    while(!TXIF);
-    TXREG = bt;
-}
-
-char UART_get_char()   
-{
-    if(OERR)
-    {
-        CREN = 0;
-        CREN = 1;
-    }
-    
-    while(!RCIF);
-    
     return RCREG;
 }
 
-void UART_send_string(char* st_pt)
+void writeRXIN(volatile unsigned char a)
 {
-    while(*st_pt)
-        UART_send_char(*st_pt++);
+    Received = a;
+}
+
+void TX(unsigned char a)
+{
+    while(!PIR1bits.TXIF);
+    TXREG = a;
+}
+
+void UART_Init()
+{
+    TRISBbits.TRISB7 = 0;	// TX PIN direction
+	TRISBbits.TRISB5 = 1;	// RX PIN direction
+    
+    SPBRG = ((_XTAL_FREQ / 16) / 9600) - 1;
+    BRGH  = 1;          // For high baud rate
+        
+    TXSTAbits.SYNC = 0; // Asynchronous mode
+    RCSTAbits.SPEN = 1; // Serial Port Enabled
+    RCSTAbits.RX9 = 0;  // 8 bit reception
+    TXSTAbits.TX9 = 0;  // 8 bit transmission
+
+    RCSTAbits.CREN = 1; // Receiver enabled
+    TXSTAbits.TXEN = 1; // Transmitter enabled 
+
+    PIE1bits.TXIE = 0;  // Enable USART Transmitter interrupt
+    PIE1bits.RCIE = 1;  // Enable USART Receive interrupt
+    
+    while (PIR1bits.RCIF)
+	{
+        writeRXIN(RX());
+    }
+
+    INTCONbits.PEIE = 1;    // Enable peripheral interrupts
+    INTCONbits.GIE = 1;     // Enable global interrupts
+}
+
+__interrupt() void ISR(void)
+{
+    if (PIE1bits.RCIE && PIR1bits.RCIF)
+    {
+        while (PIR1bits.RCIF) // Handle RX pin interrupts
+		{
+            writeRXIN(RX());
+        }
+        if (RCSTAbits.FERR)
+		{
+            flagRXFramingError = 1;
+            SPEN = 0;
+            SPEN = 1;
+
+        }
+        if (RCSTAbits.OERR)
+		{
+            flagRXOverrunError = 1;
+            CREN = 0;
+            CREN = 1;
+        }
+    }
 }
 
 // Logic functions
 void Reset()
 {
-	Alert = false;	
-	UART_send_char('y');	
+	Alert = false;
+	Received = 'x';
+	TX('y');	
 	Lcd_Clear();
     Lcd_Set_Cursor(1,1);
     Lcd_Print_String("ALL OK!");
@@ -196,6 +233,7 @@ void CheckButtons()
 	if (SW1 == 1)
 	{
         Reset();
+        LED = 1;
         __delay_ms(2000);	
 	}
         
@@ -290,9 +328,7 @@ void Alarmed()
 }
 
 void CheckRecieved()
-{
-	Received = UART_get_char();
-		
+{		
 	if (Received == 'a' || Received == 'b' || Received == 'c' || Received == 'd'
 		|| Received == 'e' || Received == 'f' || Received == 'g' || Received == 'h'
 		|| Received == 'i' || Received == 'j' || Received == 'k' || Received == 'l'
@@ -311,9 +347,12 @@ void CheckRecieved()
 
 int main()
 {
-	// Set analog pins
+	// Disable analog pins
 	ANSEL = 0;
 	ANSELH = 0;
+	
+	// Disable ADC interrupts
+	PIE1bits.ADIE = 0;
 	
 	// Set port directions
 	TRISAbits.TRISA2 = 0;	// LCD
@@ -331,7 +370,7 @@ int main()
 	//char s[16];
 	//sprintf(s, "Integer = %d", a);
 		
-	Initialize_UART();	
+	UART_Init();
     Lcd_Start();
     Reset();
 	
