@@ -18,10 +18,10 @@
 #define D6 RC2
 #define D7 RB4
 
-#define SW1 PORTCbits.RC3
-#define SW2 PORTCbits.RC6
-#define SW3 PORTCbits.RC7
-#define LED	PORTBbits.RB6
+#define SW_Mute     PORTCbits.RC3
+#define SW_Reset    PORTCbits.RC6
+#define SW_Light    PORTCbits.RC7
+#define LED         PORTBbits.RB6
 
 #define _XTAL_FREQ 4000000
 #pragma config FOSC=INTRCIO, WDTE=OFF, PWRTE=OFF, MCLRE=ON, CP=OFF, CPD=OFF, BOREN=OFF, IESO=OFF, FCMEN=OFF
@@ -33,6 +33,7 @@
 #include <stdbool.h>
 
 //// Function declarations
+void Mute(void);
 void Reset(void);
 void CheckButtons(void);
 void Alarmed(void);
@@ -44,7 +45,7 @@ int flagRXOverrunError = 0;
 volatile unsigned char Received;
 bool Alert;
 
-// LCD functions
+// <editor-fold defaultstate="collapsed" desc="LCD functions">
 void Lcd_SetBit(char data_bit)
 {
     if(data_bit& 1) 
@@ -144,8 +145,9 @@ void Lcd_Print_String(char *a)
     for(i=0;a[i]!='\0';i++)
        Lcd_Print_Char(a[i]);
 }
+// </editor-fold>
 
-// Serial communication functions
+// <editor-fold defaultstate="collapsed" desc="Serial communication functions">
 unsigned char RX()
 {
     return RCREG;
@@ -213,13 +215,19 @@ __interrupt() void ISR(void)
         }
     }
 }
+// </editor-fold>
 
 // Logic functions
+void Mute()
+{
+    TX('z');
+}
+
 void Reset()
 {
 	Alert = false;
-	Received = 'x';
-	TX('y');	
+	//Received = 'x';
+	TX('y');
 	Lcd_Clear();
     Lcd_Set_Cursor(1,1);
     Lcd_Print_String("ALL OK!");
@@ -228,21 +236,23 @@ void Reset()
 }
 
 void CheckButtons()
-{
-	// SW1 pushed (RESET)
-	if (SW1 == 1)
+{	
+	if (SW_Mute == 1)
 	{
+        Mute();
+        __delay_ms(50);
+	}
+    if (SW_Reset == 1)
+    {
         Reset();
         LED = 1;
-        __delay_ms(2000);	
-	}
-        
-	// SW3 pushed (LIGHT)
-    else if (SW3 == 1 || Alert == 1)
+        __delay_ms(2000);
+	}	
+    if (SW_Light == 1 || Alert == 1)
 	{
 		LED = 1;
 	}		
-	else if (SW3 == 0 && Alert == 0)
+	if (SW_Light == 0 && Alert == 0)
 	{
 		LED = 0;
 	}
@@ -342,7 +352,13 @@ void CheckRecieved()
 			Alert = 1;
 		}			
 		Alarmed();
-	}	
+	}
+    /*else if (Received == 'x')
+    {
+        LED = 1;
+        __delay_ms(50);
+        LED = 0;
+    }*/
 }
 
 int main()
