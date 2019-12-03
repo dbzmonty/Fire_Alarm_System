@@ -10,13 +10,28 @@
  */
 
 // Definitions
-#define _XTAL_FREQ 4000000
-#pragma config FOSC=INTRCIO, WDTE=OFF, PWRTE=OFF, MCLRE=ON, CP=OFF, CPD=OFF, BOREN=OFF, IESO=OFF, FCMEN=OFF
+#define _XTAL_FREQ 20000000
+#pragma config FOSC=HS, WDTE=OFF, PWRTE=ON, MCLRE=OFF, CP=OFF, CPD=OFF, BOREN=ON, IESO=OFF, FCMEN=OFF
 
-#define BellButton	PORTAbits.RA5
-#define BellPort	PORTAbits.RA4
-#define PortA		PORTCbits.RC4
-#define PortB		PORTCbits.RC5
+#define SensorPower	PORTDbits.RD1
+#define BellButton	PORTAbits.RA0
+#define BellPort	PORTDbits.RD0
+#define PortA		PORTBbits.RB7
+#define PortB		PORTBbits.RB6
+#define PortC		PORTBbits.RB5
+#define PortD		PORTBbits.RB4
+#define PortE		PORTBbits.RB3
+#define PortF		PORTBbits.RB2
+#define PortG		PORTBbits.RB1
+#define PortH		PORTBbits.RB0
+#define PortI		PORTDbits.RD7
+#define PortJ		PORTDbits.RD6
+#define PortK		PORTDbits.RD5
+#define PortL		PORTDbits.RD4
+#define PortM		PORTCbits.RC5
+#define PortN		PORTCbits.RC4
+#define PortO		PORTDbits.RD3
+#define PortP		PORTDbits.RD2
 
 // Includes
 #include <xc.h>
@@ -111,15 +126,83 @@ void CheckPorts()
 {
 	if (PortA == 1)
 	{
-		Alert = 1;
         Alarm();
 		TX('a');
 	}
 	if (PortB == 1)
 	{
-		Alert = 1;
         Alarm();
 		TX('b');
+	}
+	if (PortC == 1)
+	{
+        Alarm();
+		TX('c');
+	}
+	if (PortD == 1)
+	{
+        Alarm();
+		TX('d');
+	}
+	if (PortE == 1)
+	{
+        Alarm();
+		TX('e');
+	}
+	if (PortF == 1)
+	{
+        Alarm();
+		TX('f');
+	}
+	if (PortG == 1)
+	{
+        Alarm();
+		TX('g');
+	}
+	if (PortH == 1)
+	{
+        Alarm();
+		TX('h');
+	}
+	if (PortI == 1)
+	{
+        Alarm();
+		TX('i');
+	}
+	if (PortJ == 1)
+	{
+        Alarm();
+		TX('j');
+	}
+	if (PortK == 1)
+	{
+        Alarm();
+		TX('k');
+	}
+	if (PortL == 1)
+	{
+        Alarm();
+		TX('l');
+	}
+	if (PortM == 1)
+	{
+        Alarm();
+		TX('m');
+	}
+	if (PortN == 1)
+	{
+        Alarm();
+		TX('n');
+	}
+	if (PortO == 1)
+	{
+        Alarm();
+		TX('o');
+	}
+	if (PortP == 1)
+	{
+        Alarm();
+		TX('p');
 	}
 }
 
@@ -138,21 +221,22 @@ void CheckDoorBell()
 
 void CheckRecieved()
 {		
-	if (Received == 'y' && Alert == 1) // Reset
+	if (Received == 'y') // Reset
 	{	
-        // Áramszünetet a szenzoroknak
-		Alert = 0;
+        SensorPower = 1;
         BellMuted = 0;
         TX('x');
 	}
-    if (Received == 'z' && Alert == 1) // Mute
+    if (Received == 'z' && Alert == 0) // Mute
 	{	
+		SensorPower = 0;
         BellMuted = 1;
 	}
 }
 
 void Alarm()
 {
+	Alert = 1;
 	if (BellMuted == 0)
 	{
 		BellPort = 1;
@@ -172,12 +256,28 @@ int main()
 	PIE1bits.ADIE = 0;
 	
 	// Set port directions
-	TRISAbits.TRISA5 = 1;	// BellButton
-	TRISAbits.TRISA4 = 0;	// BellPort
-	TRISCbits.TRISC4 = 1;	// PortA
-	TRISCbits.TRISC5 = 1;	// PortB
-				
+	TRISDbits.TRISD1 = 0;	// SensorPower
+	TRISAbits.TRISA0 = 1;	// BellButton
+	TRISAbits.TRISD0 = 0;	// BellPort
+	TRISBbits.TRISB7 = 1;	// PortA
+	TRISBbits.TRISB6 = 1;	// PortB
+	TRISBbits.TRISB5 = 1;	// PortC
+	TRISBbits.TRISB4 = 1;	// PortD
+	TRISBbits.TRISB3 = 1;	// PortE
+	TRISBbits.TRISB2 = 1;	// PortF
+	TRISBbits.TRISB1 = 1;	// PortG
+	TRISDbits.TRISB0 = 1;	// PortH
+	TRISDbits.TRISD7 = 1;	// PortI
+	TRISDbits.TRISD6 = 1;	// PortJ
+	TRISDbits.TRISD5 = 1;	// PortK
+	TRISCbits.TRISD4 = 1;	// PortL
+	TRISDbits.TRISC5 = 1;	// PortM
+	TRISCbits.TRISC4 = 1;	// PortN
+	TRISDbits.TRISD3 = 1;	// PortO
+	TRISDbits.TRISD2 = 1;	// PortP
+	
 	UART_Init();
+	SensorPower = 1;
     BellMuted = 0;
 		
 	while(1) // The main loop

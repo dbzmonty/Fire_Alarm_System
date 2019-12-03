@@ -1,0 +1,12 @@
+TXIE		TX int. bit
+RCIE		RX int. bit
+PEIE		Peripheral Interrupt Enable
+
+TXIF		TX int. function - raised when the last bit of the framed data, the stop bit, is transferred
+RCIF		RX int. function - raised when the entire frame of data, including the stop bit, is received
+
+TXREG		TX register
+RCREG		RX register
+
+RCIF raised to pick up the byte in RCREG before it overrun
+

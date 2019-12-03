@@ -24,7 +24,7 @@
 #define LED         PORTBbits.RB6
 
 #define _XTAL_FREQ 4000000
-#pragma config FOSC=INTRCIO, WDTE=OFF, PWRTE=OFF, MCLRE=ON, CP=OFF, CPD=OFF, BOREN=OFF, IESO=OFF, FCMEN=OFF
+#pragma config FOSC=INTRCIO, WDTE=OFF, PWRTE=ON, MCLRE=OFF, CP=OFF, CPD=OFF, BOREN=ON, IESO=OFF, FCMEN=OFF
 
 // Includes
 #include <xc.h>
@@ -221,6 +221,8 @@ __interrupt() void ISR(void)
 void Mute()
 {
     TX('z');
+	Lcd_Set_Cursor(1,1);
+    Lcd_Print_String("ALARM MUTED!");
 }
 
 void Reset()
@@ -353,12 +355,6 @@ void CheckRecieved()
 		}			
 		Alarmed();
 	}
-    /*else if (Received == 'x')
-    {
-        LED = 1;
-        __delay_ms(50);
-        LED = 0;
-    }*/
 }
 
 int main()
@@ -381,10 +377,6 @@ int main()
 	TRISCbits.TRISC6 = 1;	// SW2
 	TRISCbits.TRISC7 = 1;	// SW3
 	TRISBbits.TRISB6 = 0;	// LED
-	
-	//int a = 56;
-	//char s[16];
-	//sprintf(s, "Integer = %d", a);
 		
 	UART_Init();
     Lcd_Start();

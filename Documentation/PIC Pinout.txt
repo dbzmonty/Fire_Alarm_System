@@ -18,7 +18,7 @@ Indoor:
 Controller:
 
 1	MCLR	P+
-2	RA0		
+2	RA0		BellButton
 3	RA1		
 4	RA2		
 5	RA3		
@@ -34,27 +34,27 @@ Controller:
 15	RC0		
 16	RC1		
 17	RC2		
-18	RC3		SCL
-19	RD0		
-20	RD1		
-21	RD2		
-22	RD3		
-23	RC4		SDA
-24	RC5		
+18	RC3		
+19	RD0		BellPort
+20	RD1		SensorPower
+21	RD2		PortP
+22	RD3		PortO
+23	RC4		PortN
+24	RC5		PortM
 25	RC6		TX
 26	RC7		RX
-27	RD4		
-28	RD5		
-29	RD6		
-30	RD7		
+27	RD4		PortL
+28	RD5		PortK
+29	RD6		PortJ
+30	RD7		PortI
 31	VSS		P-
 32	VDD		P+
-33	RB0		DHT22
-34	RB1		
-35	RB2		
-36	RB3		
-37	RB4		
-38	RB5		
-39	RB6		
-40	RB7		
+33	RB0		PortH
+34	RB1		PortG
+35	RB2		PortF
+36	RB3		PortE
+37	RB4		PortD
+38	RB5		PortC
+39	RB6		PortB
+40	RB7		PortA
 
