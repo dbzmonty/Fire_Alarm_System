@@ -258,7 +258,7 @@ int main()
 	// Set port directions
 	TRISDbits.TRISD1 = 0;	// SensorPower
 	TRISAbits.TRISA0 = 1;	// BellButton
-	TRISAbits.TRISD0 = 0;	// BellPort
+	TRISDbits.TRISD0 = 0;	// BellPort
 	TRISBbits.TRISB7 = 1;	// PortA
 	TRISBbits.TRISB6 = 1;	// PortB
 	TRISBbits.TRISB5 = 1;	// PortC
@@ -266,12 +266,12 @@ int main()
 	TRISBbits.TRISB3 = 1;	// PortE
 	TRISBbits.TRISB2 = 1;	// PortF
 	TRISBbits.TRISB1 = 1;	// PortG
-	TRISDbits.TRISB0 = 1;	// PortH
+	TRISBbits.TRISB0 = 1;	// PortH
 	TRISDbits.TRISD7 = 1;	// PortI
 	TRISDbits.TRISD6 = 1;	// PortJ
 	TRISDbits.TRISD5 = 1;	// PortK
-	TRISCbits.TRISD4 = 1;	// PortL
-	TRISDbits.TRISC5 = 1;	// PortM
+	TRISDbits.TRISD4 = 1;	// PortL
+	TRISCbits.TRISC5 = 1;	// PortM
 	TRISCbits.TRISC4 = 1;	// PortN
 	TRISDbits.TRISD3 = 1;	// PortO
 	TRISDbits.TRISD2 = 1;	// PortP
