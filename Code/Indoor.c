@@ -221,14 +221,14 @@ __interrupt() void ISR(void)
 void Mute()
 {
     TX('z');
+    Lcd_Clear();
 	Lcd_Set_Cursor(1,1);
     Lcd_Print_String("ALARM MUTED!");
 }
 
 void Reset()
 {
-	Alert = false;
-	//Received = 'x';
+	Alert = 0;
 	TX('y');
 	Lcd_Clear();
     Lcd_Set_Cursor(1,1);
@@ -239,7 +239,7 @@ void Reset()
 
 void CheckButtons()
 {	
-	if (SW_Mute == 1)
+	if (SW_Mute == 1 && Alert == 1)
 	{
         Mute();
         __delay_ms(50);

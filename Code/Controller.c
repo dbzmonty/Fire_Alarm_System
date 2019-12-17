@@ -43,7 +43,7 @@
 void CheckPorts(void);
 void CheckDoorBell(void);
 void CheckRecieved(void);
-void Alarm(void);
+void Alarm(unsigned char);
 
 // Variables
 int flagRXFramingError = 0;
@@ -71,8 +71,8 @@ void TX(unsigned char a)
 
 void UART_Init()
 {
-    TRISBbits.TRISB7 = 0;	// TX PIN direction
-	TRISBbits.TRISB5 = 1;	// RX PIN direction
+    TRISCbits.TRISC6 = 0;	// TX PIN direction
+	TRISCbits.TRISC7 = 1;	// RX PIN direction
     
     SPBRG = ((_XTAL_FREQ / 16) / 9600) - 1;
     BRGH  = 1;          // For high baud rate
@@ -124,86 +124,22 @@ __interrupt() void ISR(void)
 
 void CheckPorts()
 {
-	if (PortA == 1)
-	{
-        Alarm();
-		TX('a');
-	}
-	if (PortB == 1)
-	{
-        Alarm();
-		TX('b');
-	}
-	if (PortC == 1)
-	{
-        Alarm();
-		TX('c');
-	}
-	if (PortD == 1)
-	{
-        Alarm();
-		TX('d');
-	}
-	if (PortE == 1)
-	{
-        Alarm();
-		TX('e');
-	}
-	if (PortF == 1)
-	{
-        Alarm();
-		TX('f');
-	}
-	if (PortG == 1)
-	{
-        Alarm();
-		TX('g');
-	}
-	if (PortH == 1)
-	{
-        Alarm();
-		TX('h');
-	}
-	if (PortI == 1)
-	{
-        Alarm();
-		TX('i');
-	}
-	if (PortJ == 1)
-	{
-        Alarm();
-		TX('j');
-	}
-	if (PortK == 1)
-	{
-        Alarm();
-		TX('k');
-	}
-	if (PortL == 1)
-	{
-        Alarm();
-		TX('l');
-	}
-	if (PortM == 1)
-	{
-        Alarm();
-		TX('m');
-	}
-	if (PortN == 1)
-	{
-        Alarm();
-		TX('n');
-	}
-	if (PortO == 1)
-	{
-        Alarm();
-		TX('o');
-	}
-	if (PortP == 1)
-	{
-        Alarm();
-		TX('p');
-	}
+	if (PortA == 1) Alarm('a');
+	if (PortB == 1) Alarm('b');
+	if (PortC == 1) Alarm('c');
+	if (PortD == 1) Alarm('d');
+	if (PortE == 1) Alarm('e');
+	if (PortF == 1) Alarm('f');
+	if (PortG == 1) Alarm('g');
+	if (PortH == 1) Alarm('h');
+	if (PortI == 1) Alarm('i');
+	if (PortJ == 1) Alarm('j');
+	if (PortK == 1) Alarm('k');
+	if (PortL == 1) Alarm('l');
+	if (PortM == 1) Alarm('m');
+	if (PortN == 1) Alarm('n');
+	if (PortO == 1) Alarm('o');
+	if (PortP == 1) Alarm('p');
 }
 
 void CheckDoorBell()
@@ -225,18 +161,20 @@ void CheckRecieved()
 	{	
         SensorPower = 1;
         BellMuted = 0;
+		Alert = 0;
         TX('x');
 	}
-    if (Received == 'z' && Alert == 0) // Mute
+    if (Received == 'z' && Alert == 1) // Mute
 	{	
 		SensorPower = 0;
         BellMuted = 1;
 	}
 }
 
-void Alarm()
+void Alarm(unsigned char c)
 {
 	Alert = 1;
+	TX(c);	
 	if (BellMuted == 0)
 	{
 		BellPort = 1;
