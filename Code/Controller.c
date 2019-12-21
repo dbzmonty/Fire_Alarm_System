@@ -11,7 +11,7 @@
 
 // Definitions
 #define _XTAL_FREQ 20000000
-#pragma config FOSC=HS, WDTE=OFF, PWRTE=ON, MCLRE=OFF, CP=OFF, CPD=OFF, BOREN=ON, IESO=OFF, FCMEN=OFF
+#pragma config FOSC=HS, WDTE=OFF, PWRTE=ON, MCLRE=OFF, CP=OFF, CPD=OFF, BOREN=ON, IESO=OFF, FCMEN=OFF, LVP=OFF
 
 #define SensorPower	PORTDbits.RD1
 #define BellButton	PORTAbits.RA0
